@@ -350,21 +350,21 @@ function saveName(){
   if(lastLoginDay !== today){
     localStorage.setItem("last_login_day", today);
 
-  fetch(WEBAPP_URL,{
-  method:"POST",
-  mode:"no-cors",
-  headers:{ "Content-Type":"application/json" },
-  body: JSON.stringify({
-    user_id: userId,
-    name: name,
-    login_point: 1,       // ← هنا: نقطة تسجيل الدخول اليومية
-    wird_points: 0,       // ← هنا: نقاط ورد اليوم صفر
-    eid_message: ""       // ← لا يوجد رسالة عيد
-  })
-});
+    // إرسال بيانات تسجيل الدخول اليومية
+    fetch(WEBAPP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: userId,
+        name: name,
+        login_point: 1,   // نقاط تسجيل الدخول اليومي
+        wird_points: 0,   // نقاط ورد صفر هنا
+        eid_message: ""   // لا توجد رسالة عيد
+      })
+    });
   }
  }
-
 // عرض الصفحة الرئيسية
 function showWelcome(name, firstTime){
   document.getElementById("registerBox").classList.add("hidden");
@@ -603,27 +603,29 @@ function sendWirdPoint(){
   const name = localStorage.getItem(STORAGE_KEY);
   if(!userId || !name) return;
 
+  // حساب عدد مرات الضغط على الزر لإعطاء نقاط إضافية
   let totalPresses = parseInt(localStorage.getItem("wird_total_press") || "0");
   totalPresses++;
   localStorage.setItem("wird_total_press", totalPresses);
 
-  let points = 1;
+  let points = 1; // النقاط الافتراضية
   if([5,10,15,20,25].includes(totalPresses)){
-    points = 3;
+    points = 3; // نقاط إضافية عند الوصول لهذه المرات
   }
 
-  fetch(WEBAPP_URL,{
-  method:"POST",
-  mode:"no-cors",
-  headers:{ "Content-Type":"application/json" },
-  body: JSON.stringify({
-    user_id: userId,
-    name: name,
-    login_point: 0,        // ← هنا: لا نسجل نقطة دخول
-    wird_points: points,    // ← هنا: نقاط ورد اليوم (حسب الضغط)
-    eid_message: ""         // ← لا يوجد رسالة عيد
-  })
-});
+  // إرسال نقاط ورد اليوم
+  fetch(WEBAPP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      name: name,
+      login_point: 0,    // نقاط الدخول صفر هنا
+      wird_points: points,
+      eid_message: ""    // لا توجد رسالة عيد
+    })
+  });
 }
 // عند تحميل الصفحة
 window.onload = ()=>{
