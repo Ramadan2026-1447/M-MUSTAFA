@@ -350,16 +350,16 @@ function saveName(){
   if(lastLoginDay !== today){
     localStorage.setItem("last_login_day", today);
 
-    fetch(WEBAPP_URL,{
+  fetch(WEBAPP_URL,{
   method:"POST",
   mode:"no-cors",
   headers:{ "Content-Type":"application/json" },
   body: JSON.stringify({
-    user_id:userId,
-    name:name,
-    login_point:1,
-    wird_points:0,
-    eid_message:""
+    user_id: userId,
+    name: name,
+    login_point: 1,       // ← هنا: نقطة تسجيل الدخول اليومية
+    wird_points: 0,       // ← هنا: نقاط ورد اليوم صفر
+    eid_message: ""       // ← لا يوجد رسالة عيد
   })
 });
   }
@@ -617,11 +617,11 @@ function sendWirdPoint(){
   mode:"no-cors",
   headers:{ "Content-Type":"application/json" },
   body: JSON.stringify({
-    user_id:userId,
-    name:name,
-    login_point:0,
-    wird_points:points,
-    eid_message:""
+    user_id: userId,
+    name: name,
+    login_point: 0,        // ← هنا: لا نسجل نقطة دخول
+    wird_points: points,    // ← هنا: نقاط ورد اليوم (حسب الضغط)
+    eid_message: ""         // ← لا يوجد رسالة عيد
   })
 });
 }
