@@ -350,17 +350,19 @@ function saveName(){
   if(lastLoginDay !== today){
     localStorage.setItem("last_login_day", today);
 
-    // إرسال بيانات تسجيل الدخول اليومية
-    fetch(WEBAPP_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
+    // دمج إرسال بيانات الدخول مع ورد اليوم
+    const wirdDone = localStorage.getItem("wird_done") === today ? 1 : 0;
+
+    fetch(WEBAPP_URL,{
+      method:"POST",
+      mode:"no-cors",
+      headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({
         user_id: userId,
         name: name,
-        login_point: 1,   // نقاط تسجيل الدخول اليومي
-        wird_points: 0,   // نقاط ورد صفر هنا
-        eid_message: ""   // لا توجد رسالة عيد
+        login_point: 1,       // نقاط الدخول اليوم
+        wird_points: wirdDone, // نقاط ورد اليوم إذا تم
+        eid_message: ""        // رسالة العيد فارغة
       })
     });
   }
@@ -603,27 +605,29 @@ function sendWirdPoint(){
   const name = localStorage.getItem(STORAGE_KEY);
   if(!userId || !name) return;
 
-  // حساب عدد مرات الضغط على الزر لإعطاء نقاط إضافية
+  const today = getTodayString();
+  localStorage.setItem("wird_done", today);
+
   let totalPresses = parseInt(localStorage.getItem("wird_total_press") || "0");
   totalPresses++;
   localStorage.setItem("wird_total_press", totalPresses);
 
-  let points = 1; // النقاط الافتراضية
+  let points = 1;
   if([5,10,15,20,25].includes(totalPresses)){
-    points = 3; // نقاط إضافية عند الوصول لهذه المرات
+    points = 3;
   }
 
-  // إرسال نقاط ورد اليوم
-  fetch(WEBAPP_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
+  // دمج الإرسال مع نقاط الدخول (تأكد أن login_point = 0)
+  fetch(WEBAPP_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{ "Content-Type":"application/json" },
     body: JSON.stringify({
       user_id: userId,
       name: name,
-      login_point: 0,    // نقاط الدخول صفر هنا
-      wird_points: points,
-      eid_message: ""    // لا توجد رسالة عيد
+      login_point: 0,      // لا نقاط دخول هنا
+      wird_points: points,  // نقاط ورد اليوم
+      eid_message: ""       // رسالة العيد
     })
   });
 }
@@ -631,8 +635,8 @@ function sendWirdPoint(){
 window.onload = ()=>{
   const savedName = localStorage.getItem(STORAGE_KEY);
   if(savedName){
-    getUserId();
-    handleDailyLogin();
+    getUserId();       // توليد User ID إذا لم يكن موجود
+    handleDailyLogin(); // تحديث نقاط الدخول + ورد اليوم
     showWelcome(savedName,false);
   }
 };
