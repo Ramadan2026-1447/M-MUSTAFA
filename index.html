@@ -354,7 +354,10 @@ function saveName(){
       user_id: getUserId(),
       name: localStorage.getItem(STORAGE_KEY)
     })
-  });
+  })
+  .then(r => r.text())
+  .then(t => console.log("login:", t))
+  .catch(e => console.error(e));
   }
 
 // عرض الصفحة الرئيسية
@@ -596,19 +599,14 @@ function sendWirdPoint(){
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       action: "wird",
-      user_id: getUserId()
+      user_id: getUserId(),
+      name: localStorage.getItem(STORAGE_KEY)
     })
-  });
+  })
+  .then(r => r.text())
+  .then(t => console.log("wird:", t))
+  .catch(e => console.error(e));
 }
-// عند تحميل الصفحة
-window.onload = ()=>{
-  const savedName = localStorage.getItem(STORAGE_KEY);
-  if(savedName){
-    getUserId();
-    handleDailyLogin();
-    showWelcome(savedName,false);
-  }
-};
   // ===== عداد العيد =====
 const eidTargetDate = new Date("2026-02-17T06:00:00"); 
 // ↑ غيّر التاريخ والوقت هنا فقط
