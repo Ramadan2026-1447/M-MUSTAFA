@@ -292,7 +292,7 @@ button:hover{ background:#688c6d; }
 // ===== مفاتيح عامة =====
 const STORAGE_KEY = "ramadan_user_name";
 const USER_ID_KEY = "ramadan_user_id";
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+const WEBAPP_URL = "ضع_رابط_الويب_آب_الحقيقي_هنا";
 
   function getTodayString(){
   const d = new Date();
@@ -339,30 +339,22 @@ function saveName(){
   showWelcome(name,true);
 }
   function handleDailyLogin(){
-  const today = getTodayString(); // اليوم الحالي
-  const userId = getUserId(); // نستخدم نفس User ID
-  if(!userId) return;
-
+  const today = getTodayString();
   const lastLoginDay = localStorage.getItem("last_login_day");
 
-  // إذا لم يزر المستخدم اليوم
-  if(lastLoginDay !== today){
-    localStorage.setItem("last_login_day", today);
+  if(lastLoginDay === today) return;
 
-    // إرسال النقطة إلى Google Sheets
-    const data = {
-      user_id: userId,
-      points: 1,
-      type: "daily_login",
-      date: new Date().toISOString()
-    };
+  localStorage.setItem("last_login_day", today);
 
-    fetch(WEBAPP_URL + "?action=loginPoint", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
-    });
-  }
+  fetch(WEBAPP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "login",
+      user_id: getUserId(),
+      name: localStorage.getItem(STORAGE_KEY)
+    })
+  });
   }
 
 // عرض الصفحة الرئيسية
@@ -598,31 +590,14 @@ function checkWirdStatus(){
 }
 
   // ===== إرسال نقاط ورد اليوم =====
-function sendWirdPoint() {
-  const userId = localStorage.getItem(USER_ID_KEY);
-  if (!userId) return;
-  // 🔢 عدد الأيام التي أُنجز فيها الورد (غير مرتبط بالتاريخ)
-  let totalPresses = parseInt(localStorage.getItem("wird_total_press") || "0");
-  totalPresses += 1;
-  localStorage.setItem("wird_total_press", totalPresses);
-
-  // ⭐ النقاط
-  let totalPoints = 1; // النقطة العادية
-
-if ([5, 10, 15, 20, 25].includes(totalPresses)) {
-  totalPoints = 3; // بونص فقط
-}
-  const data = {
-    user_id: userId,
-    points: totalPoints,
-    press_count: totalPresses,
-    date: new Date().toISOString()
-  };
-
-  fetch(WEBAPP_URL + "?action=wirdPoint", {
+function sendWirdPoint(){
+  fetch(WEBAPP_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "wird",
+      user_id: getUserId()
+    })
   });
 }
 // عند تحميل الصفحة
@@ -666,15 +641,14 @@ function startEidCounter(){
   updateEid();
   setInterval(updateEid,1000);
 }
-  window.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("wirdBtn");
-  if (!btn) return;
-
-btn.addEventListener("click", () => {
-  sendWirdPoint();  // أولًا تسجيل النقاط
-  markWirdDone();   // بعد ذلك قفل الزر
-});
-});
+  window.onload = ()=>{
+  const savedName = localStorage.getItem(STORAGE_KEY);
+  if(savedName){
+    getUserId();
+    handleDailyLogin();
+    showWelcome(savedName,false);
+  }
+};
 </script>
 
 </body>
