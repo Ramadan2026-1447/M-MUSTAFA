@@ -341,19 +341,18 @@ function saveName(){
   function handleDailyLogin(){
   const today = getTodayString();
   const lastLoginDay = localStorage.getItem("last_login_day");
-
   if(lastLoginDay === today) return;
 
   localStorage.setItem("last_login_day", today);
 
+  const params = new URLSearchParams();
+  params.append("action", "login");
+  params.append("user_id", getUserId());
+  params.append("name", localStorage.getItem(STORAGE_KEY));
+
   fetch(WEBAPP_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "login",
-      user_id: getUserId(),
-      name: localStorage.getItem(STORAGE_KEY)
-    })
+    body: params
   })
   .then(r => r.text())
   .then(t => console.log("login:", t))
@@ -594,14 +593,14 @@ function checkWirdStatus(){
 
   // ===== إرسال نقاط ورد اليوم =====
 function sendWirdPoint(){
+  const params = new URLSearchParams();
+  params.append("action", "wird");
+  params.append("user_id", getUserId());
+  params.append("name", localStorage.getItem(STORAGE_KEY));
+
   fetch(WEBAPP_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "wird",
-      user_id: getUserId(),
-      name: localStorage.getItem(STORAGE_KEY)
-    })
+    body: params
   })
   .then(r => r.text())
   .then(t => console.log("wird:", t))
