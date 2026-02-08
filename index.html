@@ -338,25 +338,24 @@ function saveName(){
 
   showWelcome(name,true);
 }
-  function handleDailyLogin(){
-  const today = getTodayString();
-  const lastLoginDay = localStorage.getItem("last_login_day");
-  if(lastLoginDay === today) return;
-
-  localStorage.setItem("last_login_day", today);
-
-  const params = new URLSearchParams();
-  params.append("action", "login");
-  params.append("user_id", getUserId());
-  params.append("name", localStorage.getItem(STORAGE_KEY));
+  function handleDailyLogin() {
+  const params = new URLSearchParams({
+    action: "login",
+    user_id: getUserId(),
+    name: localStorage.getItem(STORAGE_KEY)
+  });
 
   fetch(WEBAPP_URL, {
     method: "POST",
-    body: params
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params.toString()
   })
   .then(r => r.text())
   .then(t => console.log("login:", t))
   .catch(e => console.error(e));
+  }
   }
 
 // عرض الصفحة الرئيسية
@@ -592,15 +591,19 @@ function checkWirdStatus(){
 }
 
   // ===== إرسال نقاط ورد اليوم =====
-function sendWirdPoint(){
-  const params = new URLSearchParams();
-  params.append("action", "wird");
-  params.append("user_id", getUserId());
-  params.append("name", localStorage.getItem(STORAGE_KEY));
+function sendWirdPoint() {
+  const params = new URLSearchParams({
+    action: "wird",
+    user_id: getUserId(),
+    name: localStorage.getItem(STORAGE_KEY)
+  });
 
   fetch(WEBAPP_URL, {
     method: "POST",
-    body: params
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params.toString()
   })
   .then(r => r.text())
   .then(t => console.log("wird:", t))
