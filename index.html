@@ -334,7 +334,10 @@ function saveName(){
   if(!name) return;
 
   localStorage.setItem(STORAGE_KEY, name);
-  getUserId(); // ← نولّد User ID فقط
+  getUserId();
+
+  // ⬅️ إرسال أول تسجيل
+  handleDailyLogin();
 
   showWelcome(name,true);
 }
